@@ -551,3 +551,358 @@ class MyLinkedList {
   + `addAtHead`，`addAtTail`： O(1)
   + `get`，`addAtIndex`，`delete`：O(min⁡(k,N−k))，其中 k指的是元素的索引
 + 空间复杂度：所有的操作都是 O(1)。
+
+## 2 队列
+
+### 2.1 队列
+
++ 定义 
+
+<img src="https://aliyun-lc-upload.oss-cn-hangzhou.aliyuncs.com/aliyun-lc-upload/uploads/2018/08/14/screen-shot-2018-05-03-at-151021.png" alt="img" style="zoom:33%;" />
+
+在 FIFO 数据结构中，将首先处理添加到队列中的第一个元素。
+
+如上图所示，队列是典型的 FIFO 数据结构。插入（insert）操作也称作入队（enqueue），新元素始终被添加在队列的末尾。 删除（delete）操作也被称为出队（dequeue)。 你只能移除第一个元素
+
+<img src="https://pic.leetcode-cn.com/44b3a817f0880f168de9574075b61bd204fdc77748d4e04448603d6956c6428a-%E5%87%BA%E5%85%A5%E9%98%9F.gif" alt="img" style="zoom: 33%;" />
+
++ 实现
+
+为了实现队列，我们可以使用动态数组和指向队列头部的索引。
+
+如上所述，队列应支持两种操作：入队和出队。入队会向队列追加一个新元素，而出队会删除第一个元素。 所以我们需要一个索引来指出起点。
+
+```java
+// "static void main" must be defined in a public class.
+
+class MyQueue {
+    // store elements
+    private List<Integer> data;         
+    // a pointer to indicate the start position
+    private int p_start;            
+    public MyQueue() {
+        data = new ArrayList<Integer>();
+        p_start = 0;
+    }
+    /** Insert an element into the queue. Return true if the operation is successful. */
+    public boolean enQueue(int x) {
+        data.add(x);
+        return true;
+    };    
+    /** Delete an element from the queue. Return true if the operation is successful. */
+    public boolean deQueue() {
+        if (isEmpty() == true) {
+            return false;
+        }
+        p_start++;
+        return true;
+    }
+    /** Get the front item from the queue. */
+    public int Front() {
+        return data.get(p_start);
+    }
+    /** Checks whether the queue is empty or not. */
+    public boolean isEmpty() {
+        return p_start >= data.size();
+    }     
+};
+
+public class Main {
+    public static void main(String[] args) {
+        MyQueue q = new MyQueue();
+        q.enQueue(5);
+        q.enQueue(3);
+        if (q.isEmpty() == false) {
+            System.out.println(q.Front());
+        }
+        q.deQueue();
+        if (q.isEmpty() == false) {
+            System.out.println(q.Front());
+        }
+        q.deQueue();
+        if (q.isEmpty() == false) {
+            System.out.println(q.Front());
+        }
+    }
+}
+```
+
+上面的实现很简单，但在某些情况下效率很低。 随着起始指针的移动，浪费了越来越多的空间。 当我们有空间限制时，这将是难以接受的。
+
+<img src="https://aliyun-lc-upload.oss-cn-hangzhou.aliyuncs.com/aliyun-lc-upload/uploads/2018/07/21/screen-shot-2018-07-21-at-153558.png" alt="img" style="zoom:33%;" />
+
+让我们考虑一种情况，即我们只能分配一个最大长度为 5 的数组。当我们只添加少于 5 个元素时，我们的解决方案很有效。 例如，如果我们只调用入队函数四次后还想要将元素 10 入队，那么我们可以成功。
+
+但是我们不能接受更多的入队请求，这是合理的，因为现在队列已经满了。但是如果我们将一个元素出队呢？
+
+<img src="https://aliyun-lc-upload.oss-cn-hangzhou.aliyuncs.com/aliyun-lc-upload/uploads/2018/07/21/screen-shot-2018-07-21-at-153713.png" alt="img" style="zoom:33%;" />
+
+实际上，在这种情况下，我们应该能够再接受一个元素。
+
+### 2.2 循环队列
+
+此前，我们提供了一种简单但低效的队列实现。
+
+更有效的方法是使用循环队列。 具体来说，我们可以使用固定大小的数组和两个指针来指示起始位置和结束位置。 目的是重用我们之前提到的被浪费的存储。
+
++ **设计循环队列**
+
+**方法一：数组**
+
+**思路**
+
+根据问题描述，该问题使用的数据结构应该是首尾相连的 环。
+
+任何数据结构中都不存在环形结构，但是可以使用一维 数组 模拟，通过操作数组的索引构建一个 虚拟 的环。很多复杂数据结构都可以通过数组实现。
+
+对于一个固定大小的数组，任何位置都可以是队首，只要知道队列长度，就可以根据下面公式计算出队尾位置：`tailIndex = (headIndex + count − 1)modcapacity`
+
+其中 `capacity` 是数组长度，`count` 是队列长度，`headIndex` 和 `tailIndex` 分别是队首 `head` 和队尾 `tail` 索引。下图展示了使用数组实现循环的队列的例子
+
+<img src="https://pic.leetcode-cn.com/Figures/622/622_queue_with_array.png" alt="img" style="zoom:33%;" />
+
+**算法**
+
+设计数据结构的关键是如何设计 属性，好的设计属性数量更少。
+
++ 属性数量少说明属性之间冗余更低。
++ 属性冗余度越低，操作逻辑越简单，发生错误的可能性更低。
++ 属性数量少，使用的空间也少，操作性能更高。
+
+但是，也不建议使用最少的属性数量。一定的冗余可以降低操作的时间复杂度，达到时间复杂度和空间复杂度的相对平衡。
+
+根据以上原则，列举循环队列的每个属性，并解释其含义。
+
++ `queue`：一个固定大小的数组，用于保存循环队列的元素。
++ `headIndex`：一个整数，保存队首 head 的索引。
++ `count`：循环队列当前的长度，即循环队列中的元素数量。使用 hadIndex 和 count 可以计算出队尾元素的索引，因此不需要队尾属性。
++ `capacity`：循环队列的容量，即队列中最多可以容纳的元素数量。该属性不是必需的，因为队列容量可以通过数组属性得到，但是由于该属性经常使用，所以我们选择保留它。这样可以不用在 Python 中每次调用 len(queue) 中获取容量。但是在 Java 中通过 queue.length 获取容量更加高效。为了保持一致性，在两种方案中都保留该属性
+
+```java
+class MyCircularQueue {
+
+  private int[] queue;
+  private int headIndex;
+  private int count;
+  private int capacity;
+
+  /** Initialize your data structure here. Set the size of the queue to be k. */
+  public MyCircularQueue(int k) {
+    this.capacity = k;
+    this.queue = new int[k];
+    this.headIndex = 0;
+    this.count = 0;
+  }
+
+  /** Insert an element into the circular queue. Return true if the operation is successful. */
+  public boolean enQueue(int value) {
+    if (this.count == this.capacity)
+      return false;
+    this.queue[(this.headIndex + this.count) % this.capacity] = value;
+    this.count += 1;
+    return true;
+  }
+
+  /** Delete an element from the circular queue. Return true if the operation is successful. */
+  public boolean deQueue() {
+    if (this.count == 0)
+      return false;
+    this.headIndex = (this.headIndex + 1) % this.capacity;
+    this.count -= 1;
+    return true;
+  }
+
+  /** Get the front item from the queue. */
+  public int Front() {
+    if (this.count == 0)
+      return -1;
+    return this.queue[this.headIndex];
+  }
+
+  /** Get the last item from the queue. */
+  public int Rear() {
+    if (this.count == 0)
+      return -1;
+    int tailIndex = (this.headIndex + this.count - 1) % this.capacity;
+    return this.queue[tailIndex];
+  }
+
+  /** Checks whether the circular queue is empty or not. */
+  public boolean isEmpty() {
+    return (this.count == 0);
+  }
+
+  /** Checks whether the circular queue is full or not. */
+  public boolean isFull() {
+    return (this.count == this.capacity);
+  }
+}
+```
+
+**复杂度分析**
+
++ 时间复杂度：O(1)。该数据结构中，所有方法都具有恒定的时间复杂度
++ 空间复杂度：O(N)，其中 N是队列的预分配容量。循环队列的整个生命周期中，都持有该预分配的空间
+
+**改进：线程安全**
+
+上面实现满足所有的要求。
+
+> 但是可能存在一些风险。
+
+从并发性来看，该循环队列是线程不安全的。
+
+例如：下图的执行序列超出了队列的设计容量，会覆盖队尾元素。
+
+<img src="https://pic.leetcode-cn.com/Figures/622/622_concurrency.png" alt="img" style="zoom: 50%;" />
+
+这种情况称为竞态条件。更多并发性的问题可以在力扣的多线程模块练习。
+
+并发安全的解决方案很多。以方法 enQueue(int value) 为例，说明该方法的并发安全实现。
+
+```java
+class MyCircularQueue {
+
+  private Node head, tail;
+  private int count;
+  private int capacity;
+  // Additional variable to secure the access of our queue
+  private ReentrantLock queueLock = new ReentrantLock();
+
+  /** Initialize your data structure here. Set the size of the queue to be k. */
+  public MyCircularQueue(int k) {
+    this.capacity = k;
+  }
+
+  /** Insert an element into the circular queue. Return true if the operation is successful. */
+  public boolean enQueue(int value) {
+    // ensure the exclusive access for the following block.
+    queueLock.lock();
+    try {
+      if (this.count == this.capacity)
+        return false;
+
+      Node newNode = new Node(value);
+      if (this.count == 0) {
+        head = tail = newNode;
+      } else {
+        tail.nextNode = newNode;
+        tail = newNode;
+      }
+      this.count += 1;
+
+    } finally {
+      queueLock.unlock();
+    }
+    return true;
+  }
+}
+```
+
+加锁后，就可以在并发下安全使用该循环队列。
+
+为了实现并发安全，引入了额外的计算成本，但是上述改进没有改变原始数据结构的时间和空间复杂度。
+
+**方法二：单链表**
+
+**思路**
+
+单链表 和数组都是很常用的数据结构。
+
+> 与固定大小的数组相比，单链表不会为未使用的容量预分配内存，因此它的内存效率更高。
+
+单链表与数组实现方法的时间和空间复杂度相同，但是单链表的效率更高，因为这种方法不会预分配内存。
+
+下图展示了单链表实现下的 `enQueue()` 和 `deQueue()` 操作。
+
+<img src="https://pic.leetcode-cn.com/Figures/622/622_queue_linked_list.png" alt="img" style="zoom:33%;" />
+
+**算法**
+
+列举循环队列中用到的所有属性，并解释其含义。
+
++ `capacity`：循环队列可容纳的最大元素数量。
++ `head`：队首元素索引。
++ `count`：当前队列长度。该属性很重要，可以用来做边界检查。
++ `tail`：队尾元素索引。与数组实现方式相比，如果不保存队尾索引，则需要花费 O(N) 时间找到队尾元素。
+
+```java
+class Node {
+  public int value;
+  public Node nextNode;
+
+  public Node(int value) {
+    this.value = value;
+    this.nextNode = null;
+  }
+}
+
+class MyCircularQueue {
+
+  private Node head, tail;
+  private int count;
+  private int capacity;
+
+  /** Initialize your data structure here. Set the size of the queue to be k. */
+  public MyCircularQueue(int k) {
+    this.capacity = k;
+  }
+
+  /** Insert an element into the circular queue. Return true if the operation is successful. */
+  public boolean enQueue(int value) {
+    if (this.count == this.capacity)
+      return false;
+
+    Node newNode = new Node(value);
+    if (this.count == 0) {
+      head = tail = newNode;
+    } else {
+      tail.nextNode = newNode;
+      tail = newNode;
+    }
+    this.count += 1;
+    return true;
+  }
+
+  /** Delete an element from the circular queue. Return true if the operation is successful. */
+  public boolean deQueue() {
+    if (this.count == 0)
+      return false;
+    this.head = this.head.nextNode;
+    this.count -= 1;
+    return true;
+  }
+
+  /** Get the front item from the queue. */
+  public int Front() {
+    if (this.count == 0)
+      return -1;
+    else
+      return this.head.value;
+  }
+
+  /** Get the last item from the queue. */
+  public int Rear() {
+    if (this.count == 0)
+      return -1;
+    else
+      return this.tail.value;
+  }
+
+  /** Checks whether the circular queue is empty or not. */
+  public boolean isEmpty() {
+    return (this.count == 0);
+  }
+
+  /** Checks whether the circular queue is full or not. */
+  public boolean isFull() {
+    return (this.count == this.capacity);
+  }
+}
+```
+
+**复杂度分析**
+
++ 时间复杂度：O(1)，所有方法都具有恒定的时间复杂度
+
++ 空间复杂度：O(N)，与数组实现相同。但是单链表实现f方式的内存效率更高
