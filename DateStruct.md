@@ -651,7 +651,7 @@ public class Main {
 
 **思路**
 
-根据问题描述，该问题使用的数据结构应该是首尾相连的 环。
+根据问题描述，该问题使用的数据结构应该是首尾相连的环。
 
 任何数据结构中都不存在环形结构，但是可以使用一维 数组 模拟，通过操作数组的索引构建一个 虚拟 的环。很多复杂数据结构都可以通过数组实现。
 
@@ -906,3 +906,191 @@ class MyCircularQueue {
 + 时间复杂度：O(1)，所有方法都具有恒定的时间复杂度
 
 + 空间复杂度：O(N)，与数组实现相同。但是单链表实现f方式的内存效率更高
+
+---
+
+## 3 栈
+
+### 3.1 栈
+
+<img src="https://aliyun-lc-upload.oss-cn-hangzhou.aliyuncs.com/aliyun-lc-upload/uploads/2018/06/03/screen-shot-2018-06-02-at-203523.png" alt="screen-shot-2018-06-02-at-203523" style="zoom:33%;" />
+
+在 LIFO 数据结构中，将首先处理添加到队列中的最新元素。
+
+与队列不同，栈是一个 LIFO 数据结构。通常，插入操作在栈中被称作入栈 push 。与队列类似，总是`在堆栈的末尾添加一个新元素`。但是，删除操作，退栈 `pop` ，将始终删除队列中相对于它的最后一个元素。
+
+<img src="https://pic.leetcode-cn.com/691e2a8cca120acb18e77379c7cd7eec3835c8c102d1c699303f50accd1e09df-%E5%87%BA%E5%85%A5%E6%A0%88.gif" alt="691e2a8cca120acb18e77379c7cd7eec3835c8c102d1c699303f50accd1e09df-出入栈" style="zoom: 33%;" />
+
+**实现**
+
+```java
+// "static void main" must be defined in a public class.
+class MyStack {
+    private List<Integer> data;               // store elements
+    public MyStack() {
+        data = new ArrayList<>();
+    }
+    /** Insert an element into the stack. */
+    public void push(int x) {
+        data.add(x);
+    }
+    /** Checks whether the queue is empty or not. */
+    public boolean isEmpty() {
+        return data.isEmpty();
+    }
+    /** Get the top item from the queue. */
+    public int top() {
+        return data.get(data.size() - 1);
+    }
+    /** Delete an element from the queue. Return true if the operation is successful. */
+    public boolean pop() {
+        if (isEmpty()) {
+            return false;
+        }
+        data.remove(data.size() - 1);
+        return true;
+    }
+};
+
+public class Main {
+    public static void main(String[] args) {
+        MyStack s = new MyStack();
+        s.push(1);
+        s.push(2);
+        s.push(3);
+        for (int i = 0; i < 4; ++i) {
+            if (!s.isEmpty()) {
+                System.out.println(s.top());
+            }
+            System.out.println(s.pop());
+        }
+    }
+}
+```
+
+**用法**
+
+```java
+// "static void main" must be defined in a public class.
+public class Main {
+    public static void main(String[] args) {
+        // 1. Initialize a stack.
+        Stack<Integer> s = new Stack<>();
+        // 2. Push new element.
+        s.push(5);
+        s.push(13);
+        s.push(8);
+        s.push(6);
+        // 3. Check if stack is empty.
+        if (s.empty() == true) {
+            System.out.println("Stack is empty!");
+            return;
+        }
+        // 4. Pop an element.
+        s.pop();
+        // 5. Get the top element.
+        System.out.println("The top element is: " + s.peek());
+        // 6. Get the size of the stack.
+        System.out.println("The size is: " + s.size());
+    }
+}
+```
+
+---
+
+## 4 树
+
+### 4.1 树
+
+**前序遍历**
+
+> **前序遍历首先访问根节点，然后遍历左子树，最后遍历右子树。**
+
+**中序遍历**
+
+> **中序遍历是先遍历左子树，然后访问根节点，然后遍历右子树。**
+
+**后序遍历**
+
+> **后序遍历是先遍历左子树，然后遍历右子树，最后访问树的根节点。**
+
+---
+
+### 4.2 二叉树
+
++ **二叉树的前序遍历**
+
+**方法一：递归**
+
+**思路与算法**
+
+首先我们需要了解什么是二叉树的前序遍历：按照访问根节点——左子树——右子树的方式遍历这棵树，而在访问左子树或者右子树的时候，我们按照同样的方式遍历，直到遍历完整棵树。因此整个遍历过程天然具有递归的性质，我们可以直接用递归函数来模拟这一过程。
+
+定义 preorder(root) 表示当前遍历到 root 节点的答案。按照定义，我们只要首先将 root 节点的值加入答案，然后递归调用 preorder(root.left) 来遍历 root 节点的左子树，最后递归调用 preorder(root.right) 来遍历 root 节点的右子树即可，递归终止的条件为碰到空节点。
+
+**代码**
+
+```java
+class Solution {
+    public List<Integer> preorderTraversal(TreeNode root) {
+        List<Integer> res = new ArrayList<Integer>();
+        preorder(root, res);
+        return res;
+    }
+
+    public void preorder(TreeNode root, List<Integer> res) {
+        if (root == null) {
+            return;
+        }
+        res.add(root.val);
+        preorder(root.left, res);
+        preorder(root.right, res);
+    }
+}
+```
+
+**复杂度分析**
+
+> 时间复杂度：O(n)，其中 n 是二叉树的节点数。每一个节点恰好被遍历一次。
+>
+> 空间复杂度：O(n)，为递归过程中栈的开销，平均情况下为 O(\log n)，最坏情况下树呈现链状，为 O(n)。
+
+**方法二：迭代**
+
+**思路与算法**
+
+我们也可以用迭代的方式实现方法一的递归函数，两种方式是等价的，区别在于递归的时候隐式地维护了一个栈，而我们在迭代的时候需要显式地将这个栈模拟出来，其余的实现与细节都相同，具体可以参考下面的代码。
+
+**代码**
+
+```java
+class Solution {
+    public List<Integer> preorderTraversal(TreeNode root) {
+        List<Integer> res = new ArrayList<Integer>();
+        if (root == null) {
+            return res;
+        }
+
+        Deque<TreeNode> stack = new LinkedList<TreeNode>();
+        TreeNode node = root;
+        while (!stack.isEmpty() || node != null) {
+            while (node != null) {
+                res.add(node.val);
+                stack.push(node);
+                node = node.left;
+            }
+            node = stack.pop();
+            node = node.right;
+        }
+        return res;
+    }
+}
+```
+
+**复杂度分析**
+
+> 时间复杂度：O(n)，其中 n 是二叉树的节点数。每一个节点恰好被遍历一次。
+>
+> 空间复杂度：O(n)O(n)，为迭代过程中显式栈的开销，平均情况下为 O(log n)，最坏情况下树呈现链状，为 O(n)。
+
+
