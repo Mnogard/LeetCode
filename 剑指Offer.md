@@ -669,9 +669,395 @@ class Solution {
 + 时间复杂度 O(N) ： N 为数组 numsnums 长度，双指针 i, j 共同遍历整个数组。
 + 空间复杂度 O(1)： 双指针 i, j 使用常数大小的额外空间。
 
-
+---
 
 ### 3.2 代码的鲁棒性
 
+#### <span style="color:green;">剑指 Offer 22. 链表中倒数第k个节点</span>
 
+输入一个链表，输出该链表中倒数第k个节点。为了符合大多数人的习惯，本题从1开始计数，即链表的尾节点是倒数第1个节点。
+
+例如，一个链表有 6 个节点，从头节点开始，它们的值依次是 1、2、3、4、5、6。这个链表的倒数第 3 个节点是值为 4 的节点。 
+
+**示例：**
+
+```
+给定一个链表: 1->2->3->4->5, 和 k = 2.
+
+返回链表 4->5.
+```
+
+**代码：**
+
+```java
+class Solution {
+    public ListNode getKthFromEnd(ListNode head, int k) {
+        ListNode former = head, latter = head;
+        for(int i = 0; i < k; i++) {
+            former = former.next;
+        }
+        while(former != null) {
+            former = former.next;
+            latter = latter.next;
+        }
+        return latter;
+    }
+}
+```
+
+---
+
+#### <span style="color:green;">剑指 Offer 24. 反转链表</span>
+
+定义一个函数，输入一个链表的头节点，反转该链表并输出反转后链表的头节点。
+
+**示例:**
+
+```
+输入: 1->2->3->4->5->NULL
+输出: 5->4->3->2->1->NULL
+```
+
+**限制：**
+
+`0 <= 节点个数 <= 5000`
+
+**代码：**
+
+**方法一（迭代）：**
+
+```java
+class Solution {
+    public ListNode reverseList(ListNode head) {
+        ListNode prev = null;
+        ListNode curr = head;
+        while (curr != null) {
+            ListNode next = curr.next;
+            curr.next = prev;
+            prev = curr;
+            curr = next;
+        }
+        return prev;
+    }
+}
+```
+
+**方法二（递归）⚠️：**
+
+```java
+class Solution {
+    public ListNode reverseList(ListNode head) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+        ListNode newHead = reverseList(head.next);  //newHead = return head 也就是最后一个点的地址，将保持不变
+        head.next.next = head;
+        head.next = null;
+        return newHead;
+    }
+}
+```
+
+---
+
+#### <span style="color:green;">剑指 Offer 25. 合并两个排序的链表</span>
+
+输入两个递增排序的链表，合并这两个链表并使新链表中的节点仍然是递增排序的。
+
+**示例1：**
+
+```
+输入：1->2->4, 1->3->4
+输出：1->1->2->3->4->4
+```
+
+**限制：**
+
+`0 <= 链表长度 <= 1000`
+
+**代码：**
+
+```java
+class Solution {
+    public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
+        ListNode dum = new ListNode(0), cur = dum;
+        while(l1 != null && l2 != null) {
+            if(l1.val < l2.val) {
+                cur.next = l1;
+                l1 = l1.next;
+            }
+            else {
+                cur.next = l2;
+                l2 = l2.next;
+            }
+            cur = cur.next;
+        }
+        cur.next = l1 != null ? l1 : l2;
+        return dum.next;
+    }
+}
+```
+
+**复杂度分析：**
+
++ 时间复杂度O(M+N):  M,N分别为链表1,12的长度,合并操作需遍历两链表。
+
++ 空间复杂度O(1):  节点引用dam,cur使用常数大小的额外空间。
+
+---
+
+## 4 解决面试题的思路
+
+### 4.1 画图让问题形象化
+
+#### <span style="color:green;">剑指 Offer 27. 二叉树的镜像</span>
+
+请完成一个函数，输入一个二叉树，该函数输出它的镜像。
+
+**例如输入：**
+
+```
+     4
+   /   \
+  2     7
+ / \   / \
+1   3 6   9
+```
+
+**镜像输出：**
+
+```
+     4
+   /   \
+  7     2
+ / \   / \
+9   6 3   1
+```
+
+**示例 1：**
+
+```
+输入：root = [4,2,7,1,3,6,9]
+输出：[4,7,2,9,6,3,1]
+```
+
+**代码（递归法）：**
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+class Solution {
+    public TreeNode mirrorTree(TreeNode root) {
+        if(root == null) return null;
+        TreeNode tmp = root.left;
+        root.left = mirrorTree(root.right);
+        root.right = mirrorTree(tmp);
+        return root;
+    }
+}
+```
+
+---
+
+#### <span style="color:green;">剑指 Offer 28. 对称的二叉树</span>
+
+请实现一个函数，用来判断一棵二叉树是不是对称的。如果一棵二叉树和它的镜像一样，那么它是对称的。
+
+**例如，二叉树 [1,2,2,3,4,4,3] 是对称的。**
+
+```
+    1
+   / \
+  2   2
+ / \ / \
+3  4 4  3
+```
+
+**但是下面这个 [1,2,2,null,3,null,3] 则不是镜像对称的:**
+
+```
+    1
+   / \
+  2   2
+   \   \
+   3    3
+```
+
+**示例 1：**
+
+```
+输入：root = [1,2,2,3,4,4,3]
+输出：true
+```
+
+**示例 2：**
+
+```
+输入：root = [1,2,2,null,3,null,3]
+输出：false
+```
+
+**限制：**
+
+`0 <= 节点个数 <= 1000`
+
+**代码（递归）：**
+
+```java
+class Solution {
+    public boolean isSymmetric(TreeNode root) {
+        return root == null ? true : recur(root.left, root.right);
+    }
+    boolean recur(TreeNode L, TreeNode R) {
+        if(L == null && R == null) return true;
+        if(L == null || R == null || L.val != R.val) return false;
+        return recur(L.left, R.right) && recur(L.right, R.left);
+    }
+}
+```
+
+---
+
+#### <span style="color:green;">剑指 Offer 29. 顺时针打印矩阵</span>
+
+输入一个矩阵，按照从外向里以顺时针的顺序依次打印出每一个数字。
+
+**示例 1：**
+
+```
+输入：matrix = [[1,2,3],[4,5,6],[7,8,9]]
+输出：[1,2,3,6,9,8,7,4,5]
+```
+
+**示例 2：**
+
+```
+输入：matrix = [[1,2,3,4],[5,6,7,8],[9,10,11,12]]
+输出：[1,2,3,4,8,12,11,10,9,5,6,7]
+```
+
+**限制：**
+
+`0 <= matrix.length <= 100`
+`0 <= matrix[i].length <= 100`
+
+**代码：**
+
+```java
+class Solution {
+    public int[] spiralOrder(int[][] matrix) {
+        if(matrix.length == 0) return new int[0];
+        int l = 0, r = matrix[0].length -1, t = 0, b = matrix.length - 1, x = 0;
+        int[] res = new int[(r + 1) * (b + 1)];
+        while(true) {
+            for(int i = l; i <= r; i++) res[x++] = matrix[t][i];
+            if(++t > b) break;
+            for(int i = t; i <= b; i++) res[x++] = matrix[i][r];
+            if(--r < l) break;
+            for(int i = r; i >= l; i--) res[x++] = matrix[b][i];
+            if(--b < t) break;
+            for(int i = b; i >= t; i--) res[x++] = matrix[i][l];
+            if(++l > r) break;
+        }
+        return res;
+    }
+}
+```
+
+---
+
+### 4.2 举例让抽象问题具体化
+
+#### <span style="color:green;">剑指 Offer 30. 包含min函数的栈</span>
+
+定义栈的数据结构，请在该类型中实现一个能够得到栈的最小元素的 min 函数在该栈中，调用 min、push 及 pop 的时间复杂度都是 O(1)。
+
+**示例:**
+
+```
+MinStack minStack = new MinStack();
+minStack.push(-2);
+minStack.push(0);
+minStack.push(-3);
+minStack.min();   --> 返回 -3.
+minStack.pop();
+minStack.top();      --> 返回 0.
+minStack.min();   --> 返回 -2.
+```
+
+**提示：**
+
+`各函数的调用总次数不超过 20000 次`
+
+**代码：**
+
+```java
+class MinStack {
+    Stack<Integer> A, B;
+    public MinStack() {
+        A = new Stack<>();
+        B = new Stack<>();
+    }
+    public void push(int x) {
+        A.add(x);
+        if(B.empty() || B.peek() >= x)
+            B.add(x);
+    }
+    public void pop() {
+        if(A.pop().equals(B.peek()))
+            B.pop();
+    }
+    public int top() {
+        return A.peek();
+    }
+    public int min() {
+        return B.peek();
+    }
+}
+```
+
+---
+
+#### <span style="color:green;">剑指 Offer 32 - II. 从上到下打印二叉树 II</span>
+
+从上到下按层打印二叉树，同一层的节点按从左到右的顺序打印，每一层打印到一行。
+
+**例如:**
+给定二叉树: [3,9,20,null,null,15,7],
+
+```
+3
+
+   / \
+  9  20
+    /  \
+   15   7
+```
+
+**返回其层次遍历结果：**
+
+```
+[
+  [3],
+  [9,20],
+  [15,7]
+]
+```
+
+**提示：**
+
+`节点总数 <= 1000`
+
+**代码：**
+
+```java
+
+```
 
