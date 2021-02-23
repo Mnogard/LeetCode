@@ -1147,7 +1147,7 @@ class Solution {
 `0 <= k <= arr.length <= 10000`
 `0 <= arr[i] <= 10000`
 
-代码：
+**代码：**
 
 ```java
 class Solution {
@@ -1158,6 +1158,233 @@ class Solution {
             vec[i] = arr[i];
         }
         return vec;
+    }
+}
+```
+
+---
+
+#### <span style="color:green;">剑指 Offer 42. 连续子数组的最大和</span>
+
+输入一个整型数组，数组中的一个或连续多个整数组成一个子数组。求所有子数组的和的最大值。
+
+要求时间复杂度为O(n)。
+
+**示例1:**
+
+```
+输入: nums = [-2,1,-3,4,-1,2,1,-5,4]
+输出: 6
+解释: 连续子数组 [4,-1,2,1] 的和最大，为 6。
+```
+
+**提示：**
+
+`1 <= arr.length <= 10^5`
+`-100 <= arr[i] <= 100`
+
+**代码：**
+
+```java
+class Solution {
+    public int maxSubArray(int[] nums) {
+        int res = nums[0];
+        for(int i = 1; i < nums.length; i++) {
+            nums[i] += Math.max(nums[i-1], 0);
+            res = Math.max(res, nums[i]);
+        }
+        return res;
+    }
+}
+```
+
+---
+
+## 5.2 时间效率与空间效率的平衡
+
+#### <span style="color:green;">剑指 Offer 50. 第一个只出现一次的字符</span>
+
+在字符串 s 中找出第一个只出现一次的字符。如果没有，返回一个单空格。 s 只包含小写字母。
+
+**示例:**
+
+```
+s = "abaccdeff"
+返回 "b"
+```
+
+```
+s = "" 
+返回 " "
+```
+
+**限制：**
+
+`0 <= s 的长度 <= 50000`
+
+**代码：**
+
+**方法一：哈希表**
+
+```java
+class Solution {
+    public char firstUniqChar(String s) {
+        HashMap<Character, Boolean> dic = new HashMap<>();
+        char[] sc = s.toCharArray();
+        for(char c : sc)
+            dic.put(c, !dic.containsKey(c));
+        for(char c : sc)
+            if(dic.get(c)) return c;
+        return ' ';
+    }
+}
+```
+
+**方法二：有序哈希表**
+
+```java
+class Solution {
+    public char firstUniqChar(String s) {
+        Map<Character, Boolean> dic = new LinkedHashMap<>();
+        char[] sc = s.toCharArray();
+        for(char c : sc)
+            dic.put(c, !dic.containsKey(c));
+        for(Map.Entry<Character, Boolean> d : dic.entrySet()){
+           if(d.getValue()) return d.getKey();
+        }
+        return ' ';
+    }
+}
+```
+
+---
+
+#### <span style="color:green;">剑指 Offer 52. 两个链表的第一个公共节点</span>
+
+输入两个链表，找出它们的第一个公共节点。
+
+如下面的两个链表：
+
+<img src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/14/160_statement.png" alt="img" style="zoom: 50%;" />
+
+在节点 c1 开始相交。
+
+ 
+
+**示例 1：**
+
+<img src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/14/160_example_1.png" alt="img" style="zoom:50%;" />
+
+```
+输入：intersectVal = 8, listA = [4,1,8,4,5], listB = [5,0,1,8,4,5], skipA = 2, skipB = 3
+输出：Reference of the node with value = 8
+输入解释：相交节点的值为 8 （注意，如果两个列表相交则不能为 0）。从各自的表头开始算起，链表 A 为 [4,1,8,4,5]，链表 B 为 [5,0,1,8,4,5]。在 A 中，相交节点前有 2 个节点；在 B 中，相交节点前有 3 个节点。
+```
+
+**示例 2：**
+
+<img src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/14/160_example_2.png" alt="img" style="zoom:50%;" />
+
+```
+输入：intersectVal = 2, listA = [0,9,1,2,4], listB = [3,2,4], skipA = 3, skipB = 1
+输出：Reference of the node with value = 2
+输入解释：相交节点的值为 2 （注意，如果两个列表相交则不能为 0）。从各自的表头开始算起，链表 A 为 [0,9,1,2,4]，链表 B 为 [3,2,4]。在 A 中，相交节点前有 3 个节点；在 B 中，相交节点前有 1 个节点。
+```
+
+**示例 3：**
+
+<img src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/14/160_example_3.png" alt="img" style="zoom:50%;" />
+
+```
+输入：intersectVal = 0, listA = [2,6,4], listB = [1,5], skipA = 3, skipB = 2
+输出：null
+输入解释：从各自的表头开始算起，链表 A 为 [2,6,4]，链表 B 为 [1,5]。由于这两个链表不相交，所以 intersectVal 必须为 0，而 skipA 和 skipB 可以是任意值。
+解释：这两个链表不相交，因此返回 null。
+```
+
+**注意：**
+
+`如果两个链表没有交点，返回 null.`
+`在返回结果后，两个链表仍须保持原有的结构。`
+`可假定整个链表结构中没有循环。`
+`程序尽量满足 O(n) 时间复杂度，且仅用 O(1) 内存。`
+
+**代码：**
+
+```java
+public class Solution {
+    public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+        ListNode PA = headA;
+        ListNode PB = headB;
+         while (PA != PB) {
+            PA = PA == null ? headB : PA.next;
+            PB = PB == null ? headA : PB.next;
+        }
+        return PA;
+    }
+}
+```
+
+---
+
+## 6 面试中的各项能力
+
+### 6.1 知识迁移能力
+
+#### <span style="color:green;">剑指 Offer 53 - I. 在排序数组中查找数字 I</span>
+
+统计一个数字在排序数组中出现的次数。
+
+**示例 1:**
+
+```
+输入: nums = [5,7,7,8,8,10], target = 8
+输出: 2
+```
+
+
+**示例 2:**
+
+```
+输入: nums = [5,7,7,8,8,10], target = 6
+输出: 0
+```
+
+**限制：**
+
+`0 <= 数组长度 <= 50000`
+
+**代码：**
+
+**方法一（My）：**
+
+```java
+class Solution {
+     public int search(int[] nums, int target) {
+         int m = 0;
+         for(int num : nums) {
+             if(num == target) m++;
+         }
+         return m;
+     }
+}
+```
+
+**方法二（二分法）：**
+
+```java
+class Solution {
+    public int search(int[] nums, int target) {
+        return helper(nums, target) - helper(nums, target - 1);
+    }
+    int helper(int[] nums, int tar) {
+        int i = 0, j = nums.length - 1;
+        while(i <= j) {
+            int m = (i + j) / 2;
+            if(nums[m] <= tar) i = m + 1;
+            else j = m - 1;
+        }
+        return i;
     }
 }
 ```
